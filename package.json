@@ -5,6 +5,7 @@
     "watch": "npx tsc -w"
   },
   "dependencies": {
+    "rxjs": "^7.5.4",
     "unique-names-generator": "^4.6.0"
   },
   "devDependencies": {
