@@ -1,6 +1,7 @@
 import { ProjectManager } from './manager/project-manager';
 import { Actions } from './models/action.enum';
 import { Ecosystem } from './models/ecosystem';
+import { RobotState } from './models/robot';
 import { BarAthonMiningWorkplace } from './workplace/bar-athon-mining.workplace';
 import { BuyRobotWorkplace } from './workplace/buy-robot.workplace';
 import { FooMiningWorkplace } from './workplace/foo-mining.workplace';
@@ -42,7 +43,12 @@ const projectManager = new ProjectManager(ecosystem);
 projectManager.initEcosystemForManager();
 
 const intervalId = setInterval(() => {
+  // Workplaces make robots work
   ecosystem.workplaces.forEach((workplace, _) => workplace.makeRobotsWorkForTime(elapsedTimePerIntervalTickInSeconds));
+  // Need to make MOVING robot move ;)
+  ecosystem.robots
+    .filter((robot) => robot.getCurrentState() === RobotState.MOVING)
+    .forEach((robot) => robot.doJobForTime(elapsedTimePerIntervalTickInSeconds));
 
   projectManager.pretendToManage();
 

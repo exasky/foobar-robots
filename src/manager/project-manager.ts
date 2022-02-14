@@ -18,12 +18,12 @@ export class ProjectManager {
     let robot = new Robot();
     robot.actionFinished().subscribe(this.onRobotActionFinished);
     this.ecosystem.robots.push(robot);
-    this.ecosystem.workplaces.get(Actions.FooFightingMiningAction)?.addRobot(robot);
+    this.ecosystem.workplaces.get(Actions.FooFightingMiningAction)?.registerRobot(robot);
 
     robot = new Robot();
     robot.actionFinished().subscribe(this.onRobotActionFinished);
     this.ecosystem.robots.push(robot);
-    this.ecosystem.workplaces.get(Actions.BarAthonMiningAction)?.addRobot(robot);
+    this.ecosystem.workplaces.get(Actions.BarAthonMiningAction)?.registerRobot(robot);
 
     this.ecosystem.workplaces.forEach((workplace) => {
       workplace.reporting$.subscribe((producedResources: unknown) => {
@@ -33,19 +33,22 @@ export class ProjectManager {
   }
 
   pretendToManage() {
-    if (Math.random() > 0.99) {
+    if (Math.random() > 0.999) {
       this.doKpis();
     }
 
     this.ecosystem.robots.forEach((robot) => {
-      const nextWorkplace = this.findBestWorkplace();
+      const bestWorkplaceAccordingToManager = this.findBestWorkplace();
+      if (!bestWorkplaceAccordingToManager) {
+        throw new Error("Missing workplace. Please I con't work in those conditions. Here's my resignation.");
+      }
 
-      if (!robot.hasAction()) {
-        nextWorkplace?.addRobot(robot);
+      if (robot.isIdle()) {
+        bestWorkplaceAccordingToManager?.registerRobot(robot);
       } else {
         const robotWorkplace = robot.getCurrentWorkplace();
-        if (robotWorkplace !== nextWorkplace) {
-          robot.setNextWorkplace(nextWorkplace);
+        if (robotWorkplace !== bestWorkplaceAccordingToManager) {
+          robot.setNextWorkplace(bestWorkplaceAccordingToManager);
         }
       }
     });
@@ -91,10 +94,10 @@ export class ProjectManager {
    * Because a good manager does kpis
    */
   private doKpis(): void {
-    console.log("I'm the manager, I need to produce KPIS !!!!!");
+    console.warn("I'm the manager, I need to produce KPIS !!!!!");
     this.kpis.forEach((production, workplace) => {
-      console.log(`Workplace '${workplace.getWorkplaceRole()}' produced : ${JSON.stringify(production)}`);
+      console.warn(`Workplace '${workplace.getWorkplaceRole()}' produced : ${JSON.stringify(production)}`);
     });
-    console.log("I'm the manager, I feel goot after producing KPIS <3");
+    console.warn("I'm the manager, I feel good after producing KPIS <3");
   }
 }

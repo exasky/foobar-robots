@@ -19,14 +19,14 @@ export abstract class AbstractWorkplace {
 
   abstract getWorkplaceRole(): Actions;
 
-  addRobot(robot: Robot) {
-    this.assignedRobots.push(robot);
+  registerRobot(robot: Robot) {
     robot.setCurrentWorkplace(this);
+    this.assignedRobots.push(robot);
   }
 
-  removeRobot(robot: Robot) {
-    this.assignedRobots.splice(this.assignedRobots.indexOf(robot));
+  unregisterRobot(robot: Robot) {
     robot.setCurrentWorkplace(undefined);
+    this.assignedRobots.splice(this.assignedRobots.indexOf(robot), 1);
   }
 
   makeRobotsWorkForTime(timeToRunInSeconds: number) {
@@ -57,7 +57,6 @@ export abstract class AbstractWorkplace {
       this.reportingSubject.next(this.producedResources);
       return true;
     }
-
   }
 
   /**
