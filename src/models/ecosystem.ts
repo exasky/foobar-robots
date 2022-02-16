@@ -5,9 +5,19 @@ import { Robot } from './robot';
  */
 export class Ecosystem {
   robots: Robot[] = [];
-  
-  nbFoo: number = 0;
-  nbBar: number = 0;
-  nbFoobar: number = 0;
-  moneyMoney: number = 0;
+
+  fooCount = 0;
+  barCount = 0;
+  foobarCount = 0;
+  moneyMoney = 0;
+
+  toString(): string {
+    return JSON.stringify({
+      fooCount: this.fooCount,
+      barCount: this.barCount,
+      foobarCount: this.foobarCount,
+      moneyMoney: this.moneyMoney,
+      robotCount: this.robots.length,
+    })
+  }
 }

@@ -8,7 +8,7 @@ export class BuyRobotAction extends AbstractAction {
   }
 
   completionPossible(): boolean {
-    return this.ecosystem.moneyMoney >= 3 && this.ecosystem.nbFoo >= 6;
+    return this.ecosystem.moneyMoney >= 3 && this.ecosystem.fooCount >= 6;
   }
 
   getCompletionNotPossibleMessage(): string {
@@ -16,7 +16,7 @@ export class BuyRobotAction extends AbstractAction {
     if (this.ecosystem.moneyMoney < 3) {
       resultWarning.push('Not enough money');
     }
-    if (this.ecosystem.nbFoo < 6) {
+    if (this.ecosystem.fooCount < 6) {
       resultWarning.push('Not enough foo');
     }
     return resultWarning.join(' & ');
@@ -24,7 +24,7 @@ export class BuyRobotAction extends AbstractAction {
 
   internalCompleteAction(): void {
     this.ecosystem.moneyMoney -= 3;
-    this.ecosystem.nbFoo -= 6;
+    this.ecosystem.fooCount -= 6;
     this.ecosystem.robots.push(new Robot());
   }
 }

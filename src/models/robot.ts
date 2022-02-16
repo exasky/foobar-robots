@@ -8,16 +8,12 @@ const customConfig: Config = {
 };
 
 export class Robot {
-  private name: string;
+  readonly name: string;
   private currentAction?: AbstractAction;
-  protected elapsedTimeOnAction: number = 0;
+  protected elapsedTimeOnAction = 0;
 
   constructor() {
     this.name = uniqueNamesGenerator(customConfig);
-  }
-
-  getName() {
-    return this.name;
   }
 
   getAction(): AbstractAction | undefined {
@@ -31,9 +27,15 @@ export class Robot {
 
   doJobForTime(timeToRunInSeconds: number) {
     if (this.currentAction) {
+      if (!this.currentAction.isStarted) {
+
+      }
       this.elapsedTimeOnAction += timeToRunInSeconds;
       if (this.elapsedTimeOnAction >= this.currentAction.getTimeToComplete()) {
-        console.log(`${this.name} is trying to finish task ${this.currentAction.getActionName()}! (But not sure he'll success)`)
+        console.log(
+            `${this.name} is trying to finish task ${this.currentAction.getActionName()}!`
+            + `(But not sure he'll success)`
+        );
         this.currentAction.completeAction();
         // The robot continues his action until a new one is set
         this.elapsedTimeOnAction = 0;
