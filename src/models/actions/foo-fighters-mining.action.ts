@@ -1,5 +1,4 @@
 import { Ecosystem } from '../ecosystem';
-import { Robot } from '../robot';
 import { AbstractAction } from './abstract-action';
 
 export class FooFightersMiningAction extends AbstractAction {
@@ -8,6 +7,6 @@ export class FooFightersMiningAction extends AbstractAction {
   }
 
   internalCompleteAction(): void {
-    this.ecosystem.nbFoo += 1;
+    this.ecosystem.fooCount += 1;
   }
 }

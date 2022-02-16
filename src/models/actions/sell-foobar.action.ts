@@ -7,11 +7,11 @@ export class SellFoobarAction extends AbstractAction {
   }
 
   completionPossible(): boolean {
-    return this.ecosystem.nbFoobar > 0;
+    return this.ecosystem.foobarCount > 0;
   }
 
   getCompletionNotPossibleMessage(): string {
-    if (this.ecosystem.nbFoobar === 0) {
+    if (this.ecosystem.foobarCount === 0) {
       return 'Not enough Foobar';
     }
 
@@ -19,8 +19,8 @@ export class SellFoobarAction extends AbstractAction {
   }
 
   internalCompleteAction(): void {
-    const nbFoobarToSell = this.ecosystem.nbFoobar > 5 ? 5 : this.ecosystem.nbFoobar;
-    this.ecosystem.nbFoobar -= nbFoobarToSell;
+    const nbFoobarToSell = Math.max(5, this.ecosystem.foobarCount);
+    this.ecosystem.foobarCount -= nbFoobarToSell;
     this.ecosystem.moneyMoney += nbFoobarToSell;
   }
 }

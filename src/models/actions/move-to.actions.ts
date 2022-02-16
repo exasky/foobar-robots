@@ -1,14 +1,10 @@
-import { Ecosystem } from '../ecosystem';
 import { Robot } from '../robot';
 import { AbstractAction } from './abstract-action';
 
 export class MoveToAction extends AbstractAction {
-  private futureAction: AbstractAction;
+  private readonly futureAction: AbstractAction;
 
-  constructor(
-    futureAction: AbstractAction,
-    private robot: Robot
-  ) {
+  constructor(futureAction: AbstractAction, private robot: Robot) {
     super(5, `Moving to ${futureAction.getActionName()}`);
     this.futureAction = futureAction;
   }

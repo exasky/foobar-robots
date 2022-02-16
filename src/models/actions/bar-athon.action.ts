@@ -7,7 +7,7 @@ export class BarAthonAction extends AbstractAction {
   }
 
   internalCompleteAction(): void {
-    this.ecosystem.nbBar += 1;
+    this.ecosystem.barCount += 1;
     this.timeToComplete = BarAthonAction.getRandomTimeToComplete();
   }
 

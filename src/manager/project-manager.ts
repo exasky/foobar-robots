@@ -12,7 +12,8 @@ import { Robot } from '../models/robot';
  * The beloved project manager, asking politely robots to do the job without any pressure.
  */
 export class ProjectManager {
-  constructor(private ecosystem: Ecosystem) {}
+  constructor(private ecosystem: Ecosystem) {
+  }
 
   initEcosystemForManager() {
     // Init ecosystem with two robots doing foo & bar mining
@@ -28,16 +29,14 @@ export class ProjectManager {
   }
 
   pretendToManageForTime() {
-    const nbRobots = this.ecosystem.robots.length;
-
-    this.ecosystem.robots.forEach((robot) => {
+    this.ecosystem.robots.forEach((robot: Robot) => {
       const bestAction = this.findBestAction();
-      
+
       if (!robot.hasAction()) {
         robot.setAction(bestAction);
       } else {
-        const robotAction = this.getRobotAction(robot);
-        
+        const robotAction = ProjectManager.getRobotAction(robot);
+
         if (robotAction.getActionName() !== bestAction.getActionName()) {
           robot.setAction(new MoveToAction(bestAction, robot));
         }
@@ -45,10 +44,10 @@ export class ProjectManager {
     });
   }
 
-  private getRobotAction(robot: Robot): AbstractAction {
+  private static getRobotAction(robot: Robot): AbstractAction {
     return robot.getAction() instanceof MoveToAction
-      ? (robot.getAction() as MoveToAction).getFutureAction()
-      : (robot.getAction() as AbstractAction);
+        ? (robot.getAction() as MoveToAction).getFutureAction()
+        : (robot.getAction() as AbstractAction);
   }
 
   // Best algorithm possible by checking nb of robots assigned to a specific task for example
@@ -62,22 +61,22 @@ export class ProjectManager {
   */
   private findBestAction(): AbstractAction {
     if (this.ecosystem.moneyMoney >= 20) {
-      if (this.ecosystem.nbFoo >= 40) {
+      if (this.ecosystem.fooCount >= 40) {
         return new BuyRobotAction(this.ecosystem);
       } else {
         return new FooFightersMiningAction(this.ecosystem);
       }
     }
 
-    if (this.ecosystem.nbFoobar >= 20) {
+    if (this.ecosystem.foobarCount >= 20) {
       return new SellFoobarAction(this.ecosystem);
     }
 
-    if (this.ecosystem.nbBar >= 20 && this.ecosystem.nbFoo >= 20) {
+    if (this.ecosystem.barCount >= 20 && this.ecosystem.fooCount >= 20) {
       return new FoobarAssembly(this.ecosystem);
     }
 
-    if (this.ecosystem.nbFoo < 20) {
+    if (this.ecosystem.fooCount < 20) {
       return new FooFightersMiningAction(this.ecosystem);
     }
 
