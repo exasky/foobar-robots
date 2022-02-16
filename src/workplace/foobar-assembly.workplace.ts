@@ -4,12 +4,8 @@ import { AbstractWorkplace } from './abstract.worplace';
 
 export class FoobarAssemblyWorkplace extends AbstractWorkplace {
   constructor(ecosystem: Ecosystem) {
-    super(ecosystem);
+    super(ecosystem, Actions.FoobarAssemblyAction);
     this.producedResources = {fooCount: 0, barCount: 0, foobarCount: 0};
-  }
-
-  getWorkplaceRole(): Actions.FoobarAssemblyAction {
-    return Actions.FoobarAssemblyAction;
   }
 
   getTimeToCompleteAction(): number {
@@ -17,10 +13,10 @@ export class FoobarAssemblyWorkplace extends AbstractWorkplace {
   }
 
   canDoAction(): boolean {
-    return this.ecosystem.fooCount > 1 && this.ecosystem.barCount > 1;
+    return this.ecosystem.fooCount >= 1 && this.ecosystem.barCount >= 1;
   }
 
-  getCompletionNotPossibleMessage(): string {
+  getCannotDoActionMessage(): string {
     const resultWarning = [];
     if (this.ecosystem.fooCount < 1) {
       resultWarning.push('Not enough foo');
@@ -31,12 +27,14 @@ export class FoobarAssemblyWorkplace extends AbstractWorkplace {
     return resultWarning.join(' & ');
   }
 
-  internalCompleteAction(): boolean {
+  protected internalStartAction() {
     this.ecosystem.fooCount -= 1;
     this.ecosystem.barCount -= 1;
     this.producedResources.fooCount -= 1;
     this.producedResources.barCount -= 1;
+  }
 
+  internalCompleteAction(): boolean {
     // Success
     if (Math.floor(Math.random() * 100) + 1 > 40) {
       this.ecosystem.foobarCount += 1;

@@ -2,17 +2,10 @@ import { Actions } from '../models/action.enum';
 import { Ecosystem } from '../models/ecosystem';
 import { AbstractWorkplace } from './abstract.worplace';
 
-export class SellFoobarWorkplace extends AbstractWorkplace<Actions.SellFoobarAction> {
+export class SellFoobarWorkplace extends AbstractWorkplace {
   constructor(ecosystem: Ecosystem) {
-    super(ecosystem);
-    this.producedResources = {
-      nbFoobar: 0,
-      moneyMoney: 0,
-    };
-  }
-
-  getWorkplaceRole(): Actions.SellFoobarAction {
-    return Actions.SellFoobarAction;
+    super(ecosystem, Actions.SellFoobarAction);
+    this.producedResources = {foobarCount: 0, moneyMoney: 0};
   }
 
   getTimeToCompleteAction(): number {
@@ -20,11 +13,11 @@ export class SellFoobarWorkplace extends AbstractWorkplace<Actions.SellFoobarAct
   }
 
   canDoAction(): boolean {
-    return this.ecosystem.nbFoobar > 0;
+    return this.ecosystem.foobarCount > 0;
   }
 
-  getCompletionNotPossibleMessage(): string {
-    if (this.ecosystem.nbFoobar === 0) {
+  getCannotDoActionMessage(): string {
+    if (this.ecosystem.foobarCount === 0) {
       return 'Not enough Foobar';
     }
 
@@ -32,10 +25,9 @@ export class SellFoobarWorkplace extends AbstractWorkplace<Actions.SellFoobarAct
   }
 
   internalCompleteAction(): boolean {
-    const nbFoobarToSell =
-      this.ecosystem.nbFoobar > 5 ? 5 : this.ecosystem.nbFoobar;
+    const nbFoobarToSell = Math.min(5, this.ecosystem.foobarCount);
 
-    this.ecosystem.nbFoobar -= nbFoobarToSell;
+    this.ecosystem.foobarCount -= nbFoobarToSell;
     this.ecosystem.moneyMoney += nbFoobarToSell;
 
     this.producedResources.nbFoobar -= nbFoobarToSell;

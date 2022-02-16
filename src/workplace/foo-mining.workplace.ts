@@ -4,12 +4,8 @@ import { AbstractWorkplace } from './abstract.worplace';
 
 export class FooMiningWorkplace extends AbstractWorkplace {
   constructor(ecosystem: Ecosystem) {
-    super(ecosystem);
+    super(ecosystem, Actions.FooFightingMiningAction);
     this.producedResources = {fooCount: 0};
-  }
-
-  getWorkplaceRole(): Actions.FooFightingMiningAction {
-    return Actions.FooFightingMiningAction;
   }
 
   getTimeToCompleteAction(): number {

@@ -14,10 +14,8 @@ export abstract class AbstractWorkplace {
   private reportingSubject = new Subject<unknown>();
   reporting$ = this.reportingSubject.asObservable();
 
-  protected constructor(protected ecosystem: Ecosystem) {
+  protected constructor(protected ecosystem: Ecosystem, public readonly workplaceRole: Actions) {
   }
-
-  abstract getWorkplaceRole(): Actions;
 
   registerRobot(robot: Robot) {
     robot.setCurrentWorkplace(this);
@@ -37,25 +35,36 @@ export abstract class AbstractWorkplace {
     return true;
   }
 
-  getCompletionNotPossibleMessage(): string {
+  getCannotDoActionMessage(): string {
     return '';
   }
 
-  /**
-   * @returns True if acction succeeded, false otherwise
-   */
-  completeAction(): boolean {
+  startAction(): void {
     if (!this.canDoAction()) {
-      console.warn(
-          `Cannot complete action '${this.getWorkplaceRole()}'.`
-          + ` Reason: '${this.getCompletionNotPossibleMessage()}'`
-      );
-      return false;
+      throw new Error(this.getCannotDoActionMessage());
+    }
+
+    this.internalStartAction();
+  }
+
+  /**
+   * Remove resources from ecosystem at action start
+   */
+  protected internalStartAction(): void {
+    return;
+  }
+
+  /**
+   * Produce resources into ecosystem at action complete
+   *
+   * @returns True if action succeeded, false otherwise
+   */
+  completeAction(): void {
+    if (this.internalCompleteAction()) {
+      console.log(`YaY action '${this.workplaceRole}' complete !`);
     } else {
-      this.internalCompleteAction();
-      console.log(`YaY action '${this.getWorkplaceRole()}' complete !`);
+      console.warn(`An error occurred while completing action '${this.workplaceRole}' :(`);
       this.reportingSubject.next(this.producedResources);
-      return true;
     }
   }
 

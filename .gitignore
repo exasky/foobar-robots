@@ -10,3 +10,6 @@ node_modules/
 
 # dist
 dist/
+
+#macOS
+.DS_Store

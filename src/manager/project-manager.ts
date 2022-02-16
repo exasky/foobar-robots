@@ -16,12 +16,10 @@ export class ProjectManager {
     // Init ecosystem with two robots doing foo & bar mining
 
     let robot = new Robot();
-    robot.actionFinished().subscribe(this.onRobotActionFinished);
     this.ecosystem.robots.push(robot);
     this.ecosystem.workplaces.get(Actions.FooFightingMiningAction)?.registerRobot(robot);
 
     robot = new Robot();
-    robot.actionFinished().subscribe(this.onRobotActionFinished);
     this.ecosystem.robots.push(robot);
     this.ecosystem.workplaces.get(Actions.BarAthonMiningAction)?.registerRobot(robot);
 
@@ -40,7 +38,7 @@ export class ProjectManager {
     this.ecosystem.robots.forEach((robot) => {
       const bestWorkplaceAccordingToManager = this.findBestWorkplace();
       if (!bestWorkplaceAccordingToManager) {
-        throw new Error("Missing workplace. Please I con't work in those conditions. Here's my resignation.");
+        throw new Error("Missing workplace. Please I can't work in those conditions. Here's my resignation.");
       }
 
       if (robot.isIdle()) {
@@ -54,13 +52,10 @@ export class ProjectManager {
     });
   }
 
-  private onRobotActionFinished(robot: Robot) {
-  }
-
   // Best algorithm possible by checking nb of robots assigned to a specific task for example
   /*
   const nbRobotsByAction = new Map<string, number>();
-  // Not using this.ecosystem.robots.filter().count as if there is a lot of robots, the algorithm will do too much loops
+  // Not using this.ecosystem.robots.filter().count as if there is a lot of robots, the algorithm will do too many loops
    this.ecosystem.robots.forEach((robot) => {
      const typeOfRobotAction = typeof this.getRobotAction(robot);
      nbRobotsByAction.set(typeOfRobotAction, (nbRobotsByAction.get(typeOfRobotAction) || 0) + 1);
@@ -96,7 +91,7 @@ export class ProjectManager {
   private doKpis(): void {
     console.warn("I'm the manager, I need to produce KPIS !!!!!");
     this.kpis.forEach((production, workplace) => {
-      console.warn(`Workplace '${workplace.getWorkplaceRole()}' produced : ${JSON.stringify(production)}`);
+      console.warn(`Workplace '${workplace.workplaceRole}' produced : ${JSON.stringify(production)}`);
     });
     console.warn("I'm the manager, I feel good after producing KPIS <3");
   }

@@ -4,12 +4,8 @@ import { AbstractWorkplace } from './abstract.worplace';
 
 export class BarAthonMiningWorkplace extends AbstractWorkplace {
   constructor(ecosystem: Ecosystem) {
-    super(ecosystem);
+    super(ecosystem, Actions.BarAthonMiningAction);
     this.producedResources = {barCount: 0};
-  }
-
-  getWorkplaceRole(): Actions.BarAthonMiningAction {
-    return Actions.BarAthonMiningAction
   }
 
   /**

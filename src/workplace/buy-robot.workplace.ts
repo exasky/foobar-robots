@@ -3,18 +3,10 @@ import { Ecosystem } from '../models/ecosystem';
 import { Robot } from '../models/robot';
 import { AbstractWorkplace } from './abstract.worplace';
 
-export class BuyRobotWorkplace extends AbstractWorkplace<Actions.BuyRobotAction> {
+export class BuyRobotWorkplace extends AbstractWorkplace {
   constructor(ecosystem: Ecosystem) {
-    super(ecosystem);
-    this.producedResources = {
-      moneyMoney: 0,
-      nbFoo: 0,
-      robots: 0,
-    };
-  }
-
-  getWorkplaceRole(): Actions.BuyRobotAction {
-    return Actions.BuyRobotAction;
+    super(ecosystem, Actions.BuyRobotAction);
+    this.producedResources = {moneyMoney: 0, nbFoo: 0, robots: 0};
   }
 
   getTimeToCompleteAction(): number {
@@ -22,27 +14,29 @@ export class BuyRobotWorkplace extends AbstractWorkplace<Actions.BuyRobotAction>
   }
 
   canDoAction(): boolean {
-    return this.ecosystem.moneyMoney >= 3 && this.ecosystem.nbFoo >= 6;
+    return this.ecosystem.moneyMoney >= 3 && this.ecosystem.fooCount >= 6;
   }
 
-  getCompletionNotPossibleMessage(): string {
+  getCannotDoActionMessage(): string {
     const resultWarning = [];
     if (this.ecosystem.moneyMoney < 3) {
       resultWarning.push('Not enough money');
     }
-    if (this.ecosystem.nbFoo < 6) {
+    if (this.ecosystem.fooCount < 6) {
       resultWarning.push('Not enough foo');
     }
     return resultWarning.join(' & ');
   }
 
-  internalCompleteAction(): boolean {
+  protected internalStartAction() {
     this.ecosystem.moneyMoney -= 3;
-    this.ecosystem.nbFoo -= 6;
-    this.ecosystem.robots.push(new Robot());
-
+    this.ecosystem.fooCount -= 6;
     this.producedResources.moneyMoney -= 3;
-    this.producedResources.nbFoo -= 6;
+    this.producedResources.fooCount -= 6;
+  }
+
+  internalCompleteAction(): boolean {
+    this.ecosystem.robots.push(new Robot());
     this.producedResources.robots += 1;
 
     return true;

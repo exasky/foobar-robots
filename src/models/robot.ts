@@ -1,4 +1,3 @@
-import { Observable, Subject } from 'rxjs';
 import { adjectives, animals, colors, Config, uniqueNamesGenerator } from 'unique-names-generator';
 import { AbstractWorkplace } from '../workplace/abstract.worplace';
 
@@ -24,9 +23,6 @@ export class Robot {
 
   private timeToCompleteAction = -1;
   protected elapsedTimeOnAction = 0;
-
-  private actionFinishedSubject = new Subject<Robot>();
-  private actionFinished$: Observable<Robot> = this.actionFinishedSubject.asObservable();
 
   constructor() {
     this.name = uniqueNamesGenerator(customConfig);
@@ -58,7 +54,8 @@ export class Robot {
   setNextWorkplace(workplace?: AbstractWorkplace) {
     if (this.state === RobotState.MOVING && this.nextWorkplace !== workplace) {
       console.warn(
-        `${this.getName()} was already moving to ${this.nextWorkplace?.getWorkplaceRole()} but manager decided change the destination... Reseting elapsed time on action to 0`
+          `${this.name} was already moving to ${this.nextWorkplace?.workplaceRole} `
+          + `but manager decided change the destination... Resetting elapsed time on action to 0`
       );
       this.elapsedTimeOnAction = 0;
     }
@@ -68,11 +65,7 @@ export class Robot {
   doJobForTime(timeToRunInSeconds: number) {
     switch (this.state) {
       case RobotState.IDLE:
-        if (this.currentWorkplace) {
-          this.setWorkingState();
-        } else if (this.nextWorkplace) {
-          this.setMovingState();
-        }
+        this.handleIdleState();
         break;
       case RobotState.WORKING:
         try {
@@ -95,64 +88,9 @@ export class Robot {
     }
   }
 
-  private handleWorkingState(timeToRunInSeconds: number) {
-    if (!this.currentWorkplace) {
-      throw new Error(`Cannot work as no current workplace for robot ${this.getName()}`);
-    }
-
-    this.elapsedTimeOnAction += timeToRunInSeconds;
-    if (this.elapsedTimeOnAction >= this.timeToCompleteAction) {
-      console.log(
-        `${this.getName()} is trying to finish task '${this.currentWorkplace.getWorkplaceRole()}'! (But not sure he'll success)`
-      );
-
-      if (this.currentWorkplace.completeAction()) {
-        this.actionFinishedSubject.next(this);
-      }
-      // The robot continues his action until a new one is set
-      this.elapsedTimeOnAction = 0;
-
-      if (this.nextWorkplace) {
-        this.setMovingState();
-      }
-    }
-  }
-
-  private handleMovingState(timeToRunInSeconds: number) {
-    if (!this.nextWorkplace) {
-      throw new Error(`Cannot move as no next workplace for robot ${this.getName()}`);
-    }
-
-    if (this.currentWorkplace) {
-      throw new Error(
-        `Cannot move as already have workplace (${this.currentWorkplace.getWorkplaceRole()}) for robot ${this.getName()}`
-      );
-    }
-
-    this.elapsedTimeOnAction += timeToRunInSeconds;
-
-    if (this.elapsedTimeOnAction >= this.timeToCompleteAction) {
-      console.log(`${this.getName()} arrived in workplace '${this.nextWorkplace?.getWorkplaceRole()}'!'`);
-      this.nextWorkplace.registerRobot(this);
-      this.nextWorkplace = undefined;
-    }
-  }
-
-  private setWorkingState(): void {
-    this.state = RobotState.WORKING;
-    this.elapsedTimeOnAction = 0;
-  }
-
-  private setMovingState(): void {
-    console.log(
-      `${this.getName()} changing workplace from '${this.currentWorkplace?.getWorkplaceRole()}' to '${this.nextWorkplace?.getWorkplaceRole()}!'`
-    );
-    this.state = RobotState.MOVING;
-    this.currentWorkplace?.unregisterRobot(this);
-    this.timeToCompleteAction = 5;
-    this.elapsedTimeOnAction = 0;
-  }
-
+  /*
+    IDLE STATE
+   */
   private setIdleState(): void {
     this.currentWorkplace = undefined;
     this.nextWorkplace = undefined;
@@ -161,7 +99,91 @@ export class Robot {
     this.state = RobotState.IDLE;
   }
 
-  actionFinished(): Observable<Robot> {
-    return this.actionFinished$;
+  private handleIdleState() {
+    if (this.currentWorkplace) {
+      this.setWorkingState();
+    } else if (this.nextWorkplace) {
+      this.setMovingState();
+    }
+  }
+
+  /*
+    WORKING STATE
+   */
+  private setWorkingState(): void {
+    this.state = RobotState.WORKING;
+    this.elapsedTimeOnAction = 0;
+  }
+
+  private handleWorkingState(timeToRunInSeconds: number): void {
+    if (!this.currentWorkplace) {
+      throw new Error(`Cannot work as no current workplace for robot ${this.name}`);
+    }
+
+    if (!this.isActionStarted()) {
+      try {
+        this.currentWorkplace.startAction();
+      } catch (e) {
+        console.error(`${this.name} cannot start task '${this.currentWorkplace.workplaceRole}'. Reason ${e}`);
+        if (this.nextWorkplace) {
+          this.setMovingState();
+        }
+        return;
+      }
+    }
+
+    this.elapsedTimeOnAction += timeToRunInSeconds;
+    if (this.elapsedTimeOnAction >= this.timeToCompleteAction) {
+      console.log(`${this.name} is trying to finish task '${this.currentWorkplace.workplaceRole}'!`);
+
+      this.currentWorkplace.completeAction();
+
+      // The robot continues his action until a new one is set
+      this.timeToCompleteAction = this.currentWorkplace.getTimeToCompleteAction();
+      this.elapsedTimeOnAction = 0;
+
+      if (this.nextWorkplace) {
+        this.setMovingState();
+      }
+    }
+  }
+
+  private isActionStarted(): boolean {
+    return this.elapsedTimeOnAction !== 0;
+  }
+
+  /*
+    MOVING STATE
+   */
+  private setMovingState(): void {
+    console.log(
+        `${this.name} changing workplace`
+        + ` from '${this.currentWorkplace?.workplaceRole}'`
+        + ` to '${this.nextWorkplace?.workplaceRole}!'`
+    );
+    this.state = RobotState.MOVING;
+    this.currentWorkplace?.unregisterRobot(this);
+    this.timeToCompleteAction = 5;
+    this.elapsedTimeOnAction = 0;
+  }
+
+  private handleMovingState(timeToRunInSeconds: number) {
+    if (!this.nextWorkplace) {
+      throw new Error(`Cannot move as no next workplace for robot ${this.name}`);
+    }
+
+    if (this.currentWorkplace) {
+      throw new Error(
+          `Cannot move as already have workplace (${this.currentWorkplace.workplaceRole}) for robot ${this.name}`
+      );
+    }
+
+    this.elapsedTimeOnAction += timeToRunInSeconds;
+
+    if (this.elapsedTimeOnAction >= this.timeToCompleteAction) {
+      console.log(`${this.name} arrived in workplace '${this.nextWorkplace.workplaceRole}'!`);
+      this.nextWorkplace.registerRobot(this);
+      this.nextWorkplace = undefined;
+    }
   }
 }

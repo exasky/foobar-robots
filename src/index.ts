@@ -44,11 +44,12 @@ projectManager.initEcosystemForManager();
 
 const intervalId = setInterval(() => {
   // Workplaces make robots work
+  // eslint-disable-next-line
   ecosystem.workplaces.forEach((workplace, _) => workplace.makeRobotsWorkForTime(elapsedTimePerIntervalTickInSeconds));
   // Need to make MOVING robot move ;)
   ecosystem.robots
-    .filter((robot) => robot.getCurrentState() === RobotState.MOVING)
-    .forEach((robot) => robot.doJobForTime(elapsedTimePerIntervalTickInSeconds));
+      .filter((robot) => robot.getCurrentState() === RobotState.MOVING)
+      .forEach((robot) => robot.doJobForTime(elapsedTimePerIntervalTickInSeconds));
 
   projectManager.pretendToManage();
 
